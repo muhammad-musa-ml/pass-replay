@@ -1,0 +1,245 @@
+{
+ "alerts": [],
+ "channels": {
+  "0": {
+   "dup": 0,
+   "late": 0,
+   "lost": 0,
+   "ok": 1420,
+   "resyncs": 0
+  },
+  "1": {
+   "dup": 0,
+   "late": 0,
+   "lost": 0,
+   "ok": 580,
+   "resyncs": 0
+  }
+ },
+ "config": {
+  "degraded_ppm": 200000,
+  "degraded_windows": 3,
+  "frame_len": 128,
+  "window_ns": 1000000000
+ },
+ "data_sha256": "3edd98685cc8edeab407964aeed5a29e9ee4efbc8285c90d2a5ca2381159682c",
+ "recording": {
+  "profile": "clean",
+  "seed": 11,
+  "synthetic": true
+ },
+ "totals": {
+  "bytes_in": 264000,
+  "channel_resyncs": 0,
+  "chunks_in": 1741,
+  "frames_bad_fecf": 0,
+  "frames_dup": 0,
+  "frames_late": 0,
+  "frames_lost": 0,
+  "frames_ok": 2000,
+  "sync_discarded_bytes": 0,
+  "trailing_bytes": 0
+ },
+ "windows": [
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 0,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 99,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 1,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 2,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 3,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 4,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 5,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 99,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 6,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 101,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 7,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 8,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 9,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 10,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 11,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 12,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 13,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 14,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 15,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 99,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 16,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 101,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 17,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 18,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 100,
+   "silent": false
+  },
+  {
+   "bad": 0,
+   "dup": 0,
+   "index": 19,
+   "late": 0,
+   "loss_ppm": 0,
+   "lost": 0,
+   "ok": 101,
+   "silent": false
+  }
+ ]
+}
