@@ -26,7 +26,9 @@ PROFILES = {
 
 
 def _edge_weight(t_ns, duration_ns):
-    # 1.0 at the ends of the pass, 0.0 in the middle; the same float steps on every platform
+    # 1.0 at the ends of the pass, 0.0 in the middle: the fourth power of the distance from the
+    # middle, in units of half the pass. No pow() or math-library call, so the floats are the
+    # same on every platform.
     x = abs(2 * t_ns - duration_ns) / duration_ns
     x2 = x * x
     return x2 * x2
@@ -47,7 +49,9 @@ def _flip_bits(rng, framed):
 
 
 def simulate(seed, profile="clean", duration_s=20, fps=100, frame_len=128, scid=0x2A5, max_chunk=300):
-    """Returns (header, chunks): a recording of one simulated pass, chunked like a modem would."""
+    """Returns (header, chunks): a recording of one simulated pass, cut into chunks of 1 to
+    max_chunk bytes. No chunk spans a gap of more than 5 frame periods. Chunk times are
+    nanoseconds from the start of the pass."""
     params = dict(DEFAULTS, **PROFILES[profile])
     rng = Rng(seed)
     period_ns = NS // fps
@@ -71,8 +75,7 @@ def simulate(seed, profile="clean", duration_s=20, fps=100, frame_len=128, scid=
     outage = params["outage"]
     received = []
     for t_ns, framed in sent:
-        # the four yes/no draws happen for every frame in every profile, so changing one
-        # rate does not change which frames the others pick
+        # the four yes/no draws are taken for every frame in every profile
         drop = rng.random() < params["base_loss"] + params["edge_loss"] * _edge_weight(t_ns, duration_ns)
         corrupt = rng.random() < params["corrupt"]
         cut = rng.random() < params["truncate"]
@@ -101,11 +104,19 @@ def simulate(seed, profile="clean", duration_s=20, fps=100, frame_len=128, scid=
     for _, framed in received:
         stream += framed
         ends.append(len(stream))
+    # A modem does not hold bytes back across a silence, so no chunk spans a long gap.
+    breaks = [ends[i] for i in range(len(received) - 1)
+              if received[i + 1][0] - received[i][0] > 5 * period_ns]
     chunks = []
     pos = 0
     seg = 0
+    nxt = 0
     while pos < len(stream):
         end = min(len(stream), pos + 1 + rng.below(max_chunk))
+        while nxt < len(breaks) and breaks[nxt] <= pos:
+            nxt += 1
+        if nxt < len(breaks):
+            end = min(end, breaks[nxt])
         while ends[seg] < end:
             seg += 1
         chunks.append((received[seg][0], bytes(stream[pos:end])))

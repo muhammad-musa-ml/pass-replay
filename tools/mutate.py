@@ -49,7 +49,8 @@ def md5(path):
 def apply_mutant(work, m):
     path = work / m["file"]
     before = md5(path)
-    text = path.read_text(encoding="utf-8", newline="")
+    with open(path, encoding="utf-8", newline="") as f:
+        text = f.read()
     found = text.count(m["old"])
     if found != 1:
         raise SystemExit("%s: anchor occurs %d times in %s, need exactly 1" % (m["id"], found, m["file"]))

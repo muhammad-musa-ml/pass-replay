@@ -1,7 +1,7 @@
 {
  "alerts": [
   {
-   "end": 11,
+   "end": 10,
    "peak_loss_ppm": 1000000,
    "start": 8
   }
@@ -124,7 +124,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 100,
+   "ok": 101,
    "silent": false
   },
   {
@@ -133,7 +133,7 @@
    "index": 8,
    "late": 0,
    "loss_ppm": 1000000,
-   "lost": 0,
+   "lost": 27,
    "ok": 0,
    "silent": true
   },
@@ -143,7 +143,7 @@
    "index": 9,
    "late": 0,
    "loss_ppm": 1000000,
-   "lost": 0,
+   "lost": 27,
    "ok": 0,
    "silent": true
   },
@@ -153,7 +153,7 @@
    "index": 10,
    "late": 0,
    "loss_ppm": 1000000,
-   "lost": 0,
+   "lost": 27,
    "ok": 0,
    "silent": true
   },
@@ -162,9 +162,9 @@
    "dup": 0,
    "index": 11,
    "late": 2,
-   "loss_ppm": 458100,
-   "lost": 82,
-   "ok": 97,
+   "loss_ppm": 10309,
+   "lost": 1,
+   "ok": 96,
    "silent": false
   },
   {
@@ -184,7 +184,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 99,
+   "ok": 100,
    "silent": false
   },
   {
@@ -204,7 +204,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 101,
+   "ok": 99,
    "silent": false
   },
   {
@@ -214,7 +214,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 99,
+   "ok": 100,
    "silent": false
   },
   {
@@ -224,7 +224,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 101,
+   "ok": 100,
    "silent": false
   },
   {
@@ -234,7 +234,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 100,
+   "ok": 101,
    "silent": false
   },
   {

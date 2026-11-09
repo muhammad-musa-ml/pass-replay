@@ -186,8 +186,8 @@
    "dup": 0,
    "index": 14,
    "late": 0,
-   "loss_ppm": 0,
-   "lost": 0,
+   "loss_ppm": 10000,
+   "lost": 1,
    "ok": 99,
    "silent": false
   },
@@ -196,8 +196,8 @@
    "dup": 0,
    "index": 15,
    "late": 0,
-   "loss_ppm": 10000,
-   "lost": 1,
+   "loss_ppm": 0,
+   "lost": 0,
    "ok": 99,
    "silent": false
   },

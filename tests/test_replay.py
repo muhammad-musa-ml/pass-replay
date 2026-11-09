@@ -44,6 +44,15 @@ def test_replay_matches_feeding_the_pipeline_directly(tmp_path):
     assert got["recording"]["seed"] == 9
 
 
+def test_replay_uses_the_pass_length_in_the_header(tmp_path):
+    header, chunks = simulate(2, "clean", duration_s=3)
+    path = tmp_path / "short.passrec"
+    recording.write(path, dict(header, duration_s=10), chunks)
+    report = replay(path)
+    assert [w["silent"] for w in report["windows"]] == [False] * 3 + [True] * 7
+    assert [(a["start"], a["end"]) for a in report["alerts"]] == [(3, 9)]
+
+
 def test_replay_twice_gives_the_same_report(tmp_path):
     header, chunks = simulate(9, "noisy", duration_s=4)
     path = tmp_path / "a.passrec"

@@ -69,6 +69,15 @@ def test_a_one_second_outage_shows_up_as_100_lost_frames():
     assert report["totals"]["frames_lost"] == 100
 
 
+def test_no_chunk_spans_an_outage():
+    _, chunks = simulate(2, "outage-short", duration_s=12)
+    stamps = [ts for ts, _ in chunks]
+    # the outage is 8.0 s to 9.0 s: the last chunk before it is stamped with the last frame sent
+    # before it, not with the time the link came back
+    assert max(t for t in stamps if t < 8_000_000_000) == 7_990_000_000
+    assert min(t for t in stamps if t >= 8_000_000_000) >= 9_000_000_000
+
+
 def test_unknown_profile_is_refused():
     with pytest.raises(KeyError):
         simulate(1, "no-such-profile")

@@ -105,8 +105,8 @@ MUTANTS = [
         "id": "M13",
         "file": "passreplay/pipeline.py",
         "what": "window index rounds to the nearest second instead of rounding down",
-        "old": "index = ts_ns // self.window_ns",
-        "new": "index = (ts_ns + self.window_ns // 2) // self.window_ns",
+        "old": "return self._window_at(ts_ns // self.window_ns)",
+        "new": "return self._window_at((ts_ns + self.window_ns // 2) // self.window_ns)",
     },
     {
         "id": "M14",
@@ -125,8 +125,8 @@ MUTANTS = [
     {
         "id": "M16",
         "file": "passreplay/pipeline.py",
-        "what": "the late-frame streak is not cleared by an in-order frame",
-        "old": '        ch["streak"] = 0',
+        "what": "the last late count is not forgotten when an in-order frame arrives",
+        "old": '        ch["pending"] = None',
         "new": "        pass",
     },
     {
@@ -149,5 +149,33 @@ MUTANTS = [
         "what": "spacecraft id read as 9 bits instead of 10",
         "old": "scid=(word >> 4) & 0x3FF,",
         "new": "scid=(word >> 4) & 0x1FF,",
+    },
+    {
+        "id": "M20",
+        "file": "passreplay/pipeline.py",
+        "what": "the reorder window is 0, not 16, so three reordered frames in a row restart the channel",
+        "old": "REORDER_WINDOW = 16",
+        "new": "REORDER_WINDOW = 0",
+    },
+    {
+        "id": "M21",
+        "file": "passreplay/pipeline.py",
+        "what": "lost frames are charged to the window where they are discovered, not spread over the gap",
+        "old": '            self._spread_loss(lost, ch["last_ts"], ts_ns)',
+        "new": '            win["lost"] += lost',
+    },
+    {
+        "id": "M22",
+        "file": "passreplay/pipeline.py",
+        "what": "silence before the first frame is ignored (the pass start is not used)",
+        "old": "lows = [t for t in (self.first_ts, start_ns) if t is not None]",
+        "new": "lows = [self.first_ts] if self.first_ts is not None else []",
+    },
+    {
+        "id": "M23",
+        "file": "passreplay/pipeline.py",
+        "what": "chunk times that go backwards are accepted",
+        "old": "if self.last_ts is not None and ts_ns < self.last_ts:",
+        "new": "if False:",
     },
 ]

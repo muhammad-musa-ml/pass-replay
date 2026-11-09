@@ -2,7 +2,7 @@ MASK = (1 << 64) - 1
 
 
 class Rng:
-    """SplitMix64. I wrote it so a seed gives the same recording on every Python version."""
+    """SplitMix64, so that a seed gives the same recording on every Python version."""
 
     def __init__(self, seed):
         self.state = seed & MASK

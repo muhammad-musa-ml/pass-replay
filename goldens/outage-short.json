@@ -118,7 +118,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 99,
+   "ok": 101,
    "silent": false
   },
   {
@@ -127,7 +127,7 @@
    "index": 8,
    "late": 0,
    "loss_ppm": 1000000,
-   "lost": 0,
+   "lost": 94,
    "ok": 0,
    "silent": true
   },
@@ -136,9 +136,9 @@
    "dup": 0,
    "index": 9,
    "late": 0,
-   "loss_ppm": 497512,
-   "lost": 100,
-   "ok": 101,
+   "loss_ppm": 57142,
+   "lost": 6,
+   "ok": 99,
    "silent": false
   },
   {
@@ -178,7 +178,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 100,
+   "ok": 99,
    "silent": false
   },
   {
@@ -188,7 +188,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 100,
+   "ok": 101,
    "silent": false
   },
   {
@@ -208,7 +208,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 100,
+   "ok": 99,
    "silent": false
   },
   {
@@ -218,7 +218,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 99,
+   "ok": 101,
    "silent": false
   },
   {
@@ -228,7 +228,7 @@
    "late": 0,
    "loss_ppm": 0,
    "lost": 0,
-   "ok": 101,
+   "ok": 100,
    "silent": false
   },
   {

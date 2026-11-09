@@ -6,7 +6,7 @@ from .replay import replay
 def corpus_table(corpus_dir):
     """A markdown table with one row per recording, built from replay reports."""
     rows = [
-        "| recording | seed | frames ok | lost | bad check | duplicate | late | channel resyncs | degraded-link alerts |",
+        "| recording | seed | frames ok | lost | failed CRC | duplicate | late | channel resyncs | degraded-link alerts |",
         "|---|---|---|---|---|---|---|---|---|",
     ]
     for rec in sorted(Path(corpus_dir).glob("*.passrec")):

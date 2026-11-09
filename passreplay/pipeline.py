@@ -4,6 +4,7 @@ from .frames import ASM, FECF_LEN, HEADER_LEN, check_fecf, parse_header
 
 COUNTER_MOD = 256
 HALF = COUNTER_MOD // 2
+REORDER_WINDOW = 16
 RESYNC_AFTER = 3
 PPM = 1_000_000
 
@@ -13,6 +14,8 @@ class Pipeline:
     turns the counts into one-second link-quality windows and degraded-link alerts."""
 
     def __init__(self, frame_len=128, window_ns=1_000_000_000, degraded_ppm=200_000, degraded_windows=3):
+        if degraded_windows < 1:
+            raise ValueError("degraded_windows must be at least 1")
         self.frame_len = frame_len
         self.window_ns = window_ns
         self.degraded_ppm = degraded_ppm
@@ -36,6 +39,8 @@ class Pipeline:
         self.digest = hashlib.sha256()
 
     def feed(self, ts_ns, chunk):
+        if self.last_ts is not None and ts_ns < self.last_ts:
+            raise ValueError("chunk times must not go backwards")
         if self.first_ts is None:
             self.first_ts = ts_ns
         self.last_ts = ts_ns
@@ -44,12 +49,14 @@ class Pipeline:
         self.buf += chunk
         self._drain(ts_ns)
 
-    def _window(self, ts_ns):
-        index = ts_ns // self.window_ns
+    def _window_at(self, index):
         win = self.windows.get(index)
         if win is None:
             win = self.windows[index] = {"ok": 0, "bad": 0, "lost": 0, "dup": 0, "late": 0}
         return win
+
+    def _window(self, ts_ns):
+        return self._window_at(ts_ns // self.window_ns)
 
     def _drain(self, ts_ns):
         buf = self.buf
@@ -79,13 +86,34 @@ class Pipeline:
                 self._window(ts_ns)["bad"] += 1
                 del buf[:asm_len]
 
+    def _late(self, ch, win):
+        ch["late"] += 1
+        win["late"] += 1
+        self.totals["frames_late"] += 1
+
+    def _spread_loss(self, lost, t0, t1):
+        """Adds lost frames to the windows between the last accepted frame on the channel and
+        this one, in proportion to the time in each, so the window where the link came back
+        gets only its share of an outage, plus the rounding remainder."""
+        w = self.window_ns
+        first, last = t0 // w, t1 // w
+        span = t1 - t0
+        given = 0
+        if span > 0:
+            for index in range(first, last):
+                part = min(t1, (index + 1) * w) - max(t0, index * w)
+                share = lost * part // span
+                self._window_at(index)["lost"] += share
+                given += share
+        self._window_at(last)["lost"] += lost - given
+
     def _accept(self, frame, ts_ns):
         h = parse_header(frame)
         win = self._window(ts_ns)
         ch = self.channels.get(h.vcid)
         if ch is None:
             ch = self.channels[h.vcid] = {
-                "last": None, "pending": None, "streak": 0,
+                "last": None, "last_ts": None, "pending": None, "streak": 0,
                 "ok": 0, "lost": 0, "dup": 0, "late": 0, "resyncs": 0,
             }
         if ch["last"] is None:
@@ -99,31 +127,33 @@ class Pipeline:
             return
         if delta > HALF:
             # With an 8-bit counter a jump of more than half the range looks the same
-            # as an old frame arriving late, so it is counted as late.
+            # as an old frame arriving late. A frame just behind the last one is late.
+            if COUNTER_MOD - delta <= REORDER_WINDOW:
+                self._late(ch, win)
+                return
+            # Further behind: after an outage of more than half the counter range the channel
+            # comes back with consecutive counts, so a run of them restarts the counter here
+            # and the size of the gap stays unknown. Anything else is a late frame.
             if ch["pending"] is not None and h.vc_count == (ch["pending"] + 1) % COUNTER_MOD:
                 ch["streak"] += 1
             else:
                 ch["streak"] = 1
             ch["pending"] = h.vc_count
             if ch["streak"] < RESYNC_AFTER:
-                ch["late"] += 1
-                win["late"] += 1
-                self.totals["frames_late"] += 1
+                self._late(ch, win)
                 return
-            # Late frames do not arrive in a run of consecutive counts. After an outage
-            # of more than half the counter range this is the channel coming back, so
-            # the counter starts again here and the size of the gap stays unknown.
             ch["resyncs"] += 1
             self.totals["channel_resyncs"] += 1
             delta = 1
-        ch["streak"] = 0
         ch["pending"] = None
         lost = delta - 1
+        if lost:
+            self._spread_loss(lost, ch["last_ts"], ts_ns)
         ch["last"] = h.vc_count
+        ch["last_ts"] = ts_ns
         ch["ok"] += 1
         ch["lost"] += lost
         win["ok"] += 1
-        win["lost"] += lost
         self.totals["frames_ok"] += 1
         self.totals["frames_lost"] += lost
         self.digest.update(bytes([h.vcid]) + frame[HEADER_LEN:-FECF_LEN])
@@ -155,13 +185,15 @@ class Pipeline:
             run = []
         return alerts
 
-    def finish(self):
+    def finish(self, start_ns=None, end_ns=None):
+        """start_ns and end_ns are the first and last instant of the pass, when known, so that
+        silence before the first frame or after the last one shows up as silent windows."""
+        lows = [t for t in (self.first_ts, start_ns) if t is not None]
+        highs = [t for t in (self.last_ts, end_ns) if t is not None]
         windows = []
-        if self.first_ts is not None:
-            first = self.first_ts // self.window_ns
-            last = self.last_ts // self.window_ns
+        if lows and highs:
             empty = {"ok": 0, "bad": 0, "lost": 0, "dup": 0, "late": 0}
-            for index in range(first, last + 1):
+            for index in range(min(lows) // self.window_ns, max(highs) // self.window_ns + 1):
                 windows.append(self._summarize(index, self.windows.get(index, empty)))
         return {
             "config": {

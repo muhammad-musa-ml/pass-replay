@@ -60,13 +60,31 @@ def test_old_frame_arriving_late_is_counted_late():
     assert report["totals"]["frames_lost"] == 0
 
 
-def test_a_single_late_frame_does_not_resync():
-    report = run([wire(0, 10), wire(0, 11), wire(0, 9), wire(0, 12)])
+def test_frames_that_arrive_out_of_order_do_not_trigger_a_resync():
+    report = run([wire(0, n) for n in (0, 4, 1, 2, 3, 5)])
     assert report["channels"]["0"]["resyncs"] == 0
+    assert report["channels"]["0"]["late"] == 3
+    # a reordered frame counts as lost when its successor arrives, and as late when it does
+    assert report["totals"]["frames_lost"] == 3
+    assert report["totals"]["frames_ok"] == 3
+
+
+def test_an_in_order_frame_ends_a_run_of_late_frames():
+    report = run([wire(0, n) for n in (200, 150, 201, 151, 202, 152)])
+    assert report["channels"]["0"]["resyncs"] == 0
+    assert report["channels"]["0"]["late"] == 3
+
+
+def test_a_single_late_frame_does_not_resync():
+    # 50 is 51 counts behind 101, past the reorder window, so it reaches the resync rule
+    report = run([wire(0, n) for n in (100, 101, 50, 102)])
+    assert report["channels"]["0"]["resyncs"] == 0
+    assert report["channels"]["0"]["late"] == 1
+    assert report["totals"]["frames_ok"] == 3
 
 
 def test_late_frames_that_are_not_consecutive_do_not_resync():
-    report = run([wire(0, n) for n in (20, 21, 5, 9, 12, 22)])
+    report = run([wire(0, n) for n in (100, 101, 50, 60, 70, 102)])
     assert report["channels"]["0"]["resyncs"] == 0
     assert report["channels"]["0"]["late"] == 3
     assert report["totals"]["frames_ok"] == 3

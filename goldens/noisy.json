@@ -136,8 +136,8 @@
    "dup": 3,
    "index": 9,
    "late": 0,
-   "loss_ppm": 40404,
-   "lost": 4,
+   "loss_ppm": 50000,
+   "lost": 5,
    "ok": 95,
    "silent": false
   },
@@ -146,8 +146,8 @@
    "dup": 2,
    "index": 10,
    "late": 1,
-   "loss_ppm": 108910,
-   "lost": 11,
+   "loss_ppm": 100000,
+   "lost": 10,
    "ok": 90,
    "silent": false
   },

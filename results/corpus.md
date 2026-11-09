@@ -1,4 +1,4 @@
-| recording | seed | frames ok | lost | bad check | duplicate | late | channel resyncs | degraded-link alerts |
+| recording | seed | frames ok | lost | failed CRC | duplicate | late | channel resyncs | degraded-link alerts |
 |---|---|---|---|---|---|---|---|---|
 | asm-in-payload | 16 | 1961 | 39 | 41 | 0 | 0 | 0 | 0 |
 | clean | 11 | 2000 | 0 | 0 | 0 | 0 | 0 | 0 |

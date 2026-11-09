@@ -12,7 +12,7 @@ from .summary import corpus_table
 
 def _print_summary(report):
     t = report["totals"]
-    print("frames ok %d, lost %d, bad check %d, duplicate %d, late %d, channel resyncs %d" % (
+    print("frames ok %d, lost %d, failed CRC %d, duplicate %d, late %d, channel resyncs %d" % (
         t["frames_ok"], t["frames_lost"], t["frames_bad_fecf"], t["frames_dup"],
         t["frames_late"], t["channel_resyncs"]))
     print("bytes discarded while searching for a marker: %d, left over at the end: %d" % (
