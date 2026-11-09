@@ -4,6 +4,7 @@ from .frames import ASM, FECF_LEN, HEADER_LEN, check_fecf, parse_header
 
 COUNTER_MOD = 256
 HALF = COUNTER_MOD // 2
+RESYNC_AFTER = 3
 PPM = 1_000_000
 
 
@@ -25,6 +26,7 @@ class Pipeline:
             "frames_lost": 0,
             "frames_dup": 0,
             "frames_late": 0,
+            "channel_resyncs": 0,
             "sync_discarded_bytes": 0,
         }
         self.channels = {}
@@ -82,7 +84,10 @@ class Pipeline:
         win = self._window(ts_ns)
         ch = self.channels.get(h.vcid)
         if ch is None:
-            ch = self.channels[h.vcid] = {"last": None, "ok": 0, "lost": 0, "dup": 0, "late": 0}
+            ch = self.channels[h.vcid] = {
+                "last": None, "pending": None, "streak": 0,
+                "ok": 0, "lost": 0, "dup": 0, "late": 0, "resyncs": 0,
+            }
         if ch["last"] is None:
             delta = 1
         else:
@@ -95,10 +100,24 @@ class Pipeline:
         if delta > HALF:
             # With an 8-bit counter a jump of more than half the range looks the same
             # as an old frame arriving late, so it is counted as late.
-            ch["late"] += 1
-            win["late"] += 1
-            self.totals["frames_late"] += 1
-            return
+            if ch["pending"] is not None and h.vc_count == (ch["pending"] + 1) % COUNTER_MOD:
+                ch["streak"] += 1
+            else:
+                ch["streak"] = 1
+            ch["pending"] = h.vc_count
+            if ch["streak"] < RESYNC_AFTER:
+                ch["late"] += 1
+                win["late"] += 1
+                self.totals["frames_late"] += 1
+                return
+            # Late frames do not arrive in a run of consecutive counts. After an outage
+            # of more than half the counter range this is the channel coming back, so
+            # the counter starts again here and the size of the gap stays unknown.
+            ch["resyncs"] += 1
+            self.totals["channel_resyncs"] += 1
+            delta = 1
+        ch["streak"] = 0
+        ch["pending"] = None
         lost = delta - 1
         ch["last"] = h.vc_count
         ch["ok"] += 1
@@ -153,7 +172,7 @@ class Pipeline:
             },
             "totals": dict(self.totals, trailing_bytes=len(self.buf)),
             "channels": {
-                str(vcid): {k: v for k, v in ch.items() if k != "last"}
+                str(vcid): {k: ch[k] for k in ("ok", "lost", "dup", "late", "resyncs")}
                 for vcid, ch in sorted(self.channels.items())
             },
             "windows": windows,

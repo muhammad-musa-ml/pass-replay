@@ -60,6 +60,27 @@ def test_old_frame_arriving_late_is_counted_late():
     assert report["totals"]["frames_lost"] == 0
 
 
+def test_a_single_late_frame_does_not_resync():
+    report = run([wire(0, 10), wire(0, 11), wire(0, 9), wire(0, 12)])
+    assert report["channels"]["0"]["resyncs"] == 0
+
+
+def test_late_frames_that_are_not_consecutive_do_not_resync():
+    report = run([wire(0, n) for n in (20, 21, 5, 9, 12, 22)])
+    assert report["channels"]["0"]["resyncs"] == 0
+    assert report["channels"]["0"]["late"] == 3
+    assert report["totals"]["frames_ok"] == 3
+
+
+def test_after_an_outage_longer_than_half_the_counter_range_the_channel_resyncs():
+    frames = [wire(0, n) for n in range(10)] + [wire(0, (210 + k) % 256) for k in range(20)]
+    report = run(frames)
+    assert report["channels"]["0"]["resyncs"] == 1
+    assert report["channels"]["0"]["late"] == 2
+    assert report["totals"]["frames_ok"] == 10 + 18
+    assert report["totals"]["frames_lost"] == 0
+
+
 def test_corrupted_frame_is_dropped_and_the_next_one_is_found():
     bad = bytearray(wire(0, 1))
     bad[40] ^= 0x01
