@@ -1,6 +1,6 @@
 import pytest
 
-from passreplay.frames import ASM, build_frame, check_fecf, parse_header
+from passreplay.frames import ASM, Header, build_frame, check_fecf, parse_header
 
 
 def test_asm_value():
@@ -17,6 +17,12 @@ def test_header_round_trip():
     frame = build_frame(0x2A5, 3, 255, 0, bytes(120), 128)
     h = parse_header(frame)
     assert (h.version, h.scid, h.vcid, h.ocf, h.mc_count, h.vc_count) == (0, 0x2A5, 3, 0, 255, 0)
+
+
+def test_header_parse_reads_every_field():
+    # version 3, scid 0x2A5, vcid 7, control flag 1: 0xC000 | 0x2A50 | 0x000F = 0xEA5F
+    frame = bytes.fromhex("ea5f55aabeef") + bytes(122)
+    assert parse_header(frame) == Header(3, 0x2A5, 7, 1, 0x55, 0xAA, 0xBEEF)
 
 
 def test_good_frame_passes_fecf():

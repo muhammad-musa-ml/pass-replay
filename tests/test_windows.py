@@ -54,6 +54,17 @@ def test_loss_ratio_rounds_down_to_whole_ppm():
     assert (w["ok"], w["lost"], w["loss_ppm"]) == (11, 2, 153_846)
 
 
+def test_a_window_at_exactly_the_threshold_is_degraded():
+    link = Link()
+    for w in (0, 1, 2):
+        link.window(w, frames=1)
+        link.count += 1
+        link.window(w, frames=3, offset_ms=1)  # 4 ok and 1 lost: exactly 200000 ppm
+    report = link.report()
+    assert [x["loss_ppm"] for x in report["windows"]] == [200_000] * 3
+    assert report["alerts"] == [{"start": 0, "end": 2, "peak_loss_ppm": 200_000}]
+
+
 def test_a_gap_is_spread_over_the_time_it_covers():
     link = Link()
     link.window(4, frames=3)

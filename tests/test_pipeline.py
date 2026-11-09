@@ -60,6 +60,12 @@ def test_old_frame_arriving_late_is_counted_late():
     assert report["totals"]["frames_lost"] == 0
 
 
+def test_a_jump_of_150_counts_is_late_not_loss():
+    report = run([wire(0, 0), wire(0, 150)])
+    assert report["channels"]["0"]["late"] == 1
+    assert report["totals"]["frames_lost"] == 0
+
+
 def test_frames_that_arrive_out_of_order_do_not_trigger_a_resync():
     report = run([wire(0, n) for n in (0, 4, 1, 2, 3, 5)])
     assert report["channels"]["0"]["resyncs"] == 0
