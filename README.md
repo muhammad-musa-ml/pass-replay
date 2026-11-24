@@ -10,8 +10,8 @@ I ran it on Python 3.13 only. It uses the standard library; pytest is needed to 
 
 ## Why
 
-Test inputs written by hand only cover the cases I thought of, and a recorded pass holds others. The
-posting for Northwood Space's Platform engineering role lists simulated ground stations and tools that
+Test inputs written by hand only cover the cases I thought of, and a recorded pass holds others. A job
+posting for a platform engineering role lists simulated ground stations and tools that
 replay recorded data. This is my small version of both; it is not based on their code. Here,
 simulated passes stand in for recorded ones.
 
